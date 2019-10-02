@@ -196,6 +196,7 @@ static const struct { const char *name; uint8_t flag; } ra_flags[] = {
 
 static int mkdir_p(char *dir, mode_t mask)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	char *l = strrchr(dir, '/');
 	int ret;
 
@@ -221,6 +222,7 @@ static int mkdir_p(char *dir, mode_t mask)
 
 static void set_interface_defaults(struct interface *iface)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	iface->ignore = true;
 	iface->dhcpv4 = MODE_DISABLED;
 	iface->dhcpv6 = MODE_DISABLED;
@@ -243,6 +245,7 @@ static void set_interface_defaults(struct interface *iface)
 
 static void clean_interface(struct interface *iface)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	free(iface->dns);
 	free(iface->search);
 	free(iface->upstream);
@@ -256,6 +259,7 @@ static void clean_interface(struct interface *iface)
 
 static void close_interface(struct interface *iface)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	avl_delete(&interfaces, &iface->avl);
 
 	router_setup_interface(iface, false);
@@ -274,6 +278,7 @@ static void close_interface(struct interface *iface)
 
 static int parse_mode(const char *mode)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	if (!strcmp(mode, "disabled"))
 		return MODE_DISABLED;
 	else if (!strcmp(mode, "server"))
@@ -288,6 +293,7 @@ static int parse_mode(const char *mode)
 
 static int parse_ra_flags(uint8_t *flags, struct blob_attr *attr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	struct blob_attr *cur;
 	unsigned rem;
 
@@ -316,6 +322,7 @@ static int parse_ra_flags(uint8_t *flags, struct blob_attr *attr)
 
 static void set_config(struct uci_section *s)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	struct blob_attr *tb[ODHCPD_ATTR_MAX], *c;
 
 	blob_buf_init(&b, 0);
@@ -352,6 +359,7 @@ static double parse_leasetime(struct blob_attr *c) {
 	char *val = blobmsg_get_string(c), *endptr = NULL;
 	double time = strcmp(val, "infinite") ? strtod(val, &endptr) : UINT32_MAX;
 
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	if (time && endptr && endptr[0]) {
 		if (endptr[0] == 's')
 			time *= 1;
@@ -378,12 +386,14 @@ err:
 
 static void free_lease(struct lease *l)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	free(l->hostname);
 	free(l);
 }
 
 static int set_lease(struct uci_section *s)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	struct blob_attr *tb[LEASE_ATTR_MAX], *c;
 	struct lease *l;
 	size_t duidlen = 0;
@@ -457,6 +467,7 @@ err:
 
 int config_parse_interface(void *data, size_t len, const char *name, bool overwrite)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	struct interface *iface;
 	struct blob_attr *tb[IFACE_ATTR_MAX], *c;
 	bool get_addrs = false;
@@ -872,6 +883,7 @@ err:
 
 static int set_interface(struct uci_section *s)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	blob_buf_init(&b, 0);
 	uci_to_blob(&b, s, &interface_attr_list);
 
@@ -880,6 +892,7 @@ static int set_interface(struct uci_section *s)
 
 static void lease_delete_assignments(struct lease *l, bool v6)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	struct dhcp_assignment *a, *tmp;
 	unsigned int flag = v6 ? OAF_DHCPV6 : OAF_DHCPV4;
 
@@ -891,6 +904,7 @@ static void lease_delete_assignments(struct lease *l, bool v6)
 
 static void lease_update_assignments(struct lease *l)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	struct dhcp_assignment *a;
 
 	list_for_each_entry(a, &l->assignments, lease_list) {
@@ -907,6 +921,7 @@ static void lease_update_assignments(struct lease *l)
 
 static int lease_cmp(const void *k1, const void *k2, _unused void *ptr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	const struct lease *l1 = k1, *l2 = k2;
 	int cmp = 0;
 
@@ -925,6 +940,7 @@ static int lease_cmp(const void *k1, const void *k2, _unused void *ptr)
 
 static void lease_change_config(struct lease *l_old, struct lease *l_new)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	bool update = false;
 
 	if ((!!l_new->hostname != !!l_old->hostname) ||
@@ -961,6 +977,7 @@ static void lease_change_config(struct lease *l_old, struct lease *l_new)
 
 static void lease_delete(struct lease *l)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	struct dhcp_assignment *a, *tmp;
 
 	list_for_each_entry_safe(a, tmp, &l->assignments, lease_list)
@@ -972,6 +989,7 @@ static void lease_delete(struct lease *l)
 static void lease_update(_unused struct vlist_tree *tree, struct vlist_node *node_new,
 			 struct vlist_node *node_old)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	struct lease *lease_new = container_of(node_new, struct lease, node);
 	struct lease *lease_old = container_of(node_old, struct lease, node);
 
@@ -983,6 +1001,7 @@ static void lease_update(_unused struct vlist_tree *tree, struct vlist_node *nod
 
 struct lease *config_find_lease_by_duid(const uint8_t *duid, const uint16_t len)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	struct lease *l;
 
 	vlist_for_each_element(&leases, l, node) {
@@ -995,6 +1014,7 @@ struct lease *config_find_lease_by_duid(const uint8_t *duid, const uint16_t len)
 
 struct lease *config_find_lease_by_mac(const uint8_t *mac)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	struct lease *l;
 
 	vlist_for_each_element(&leases, l, node) {
@@ -1008,6 +1028,7 @@ struct lease *config_find_lease_by_mac(const uint8_t *mac)
 
 struct lease *config_find_lease_by_hostid(const uint32_t hostid)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	struct lease *l;
 
 	vlist_for_each_element(&leases, l, node) {
@@ -1020,6 +1041,7 @@ struct lease *config_find_lease_by_hostid(const uint32_t hostid)
 
 struct lease *config_find_lease_by_ipaddr(const uint32_t ipaddr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	struct lease *l;
 
 	vlist_for_each_element(&leases, l, node) {
@@ -1032,6 +1054,7 @@ struct lease *config_find_lease_by_ipaddr(const uint32_t ipaddr)
 
 void odhcpd_reload(void)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	struct uci_context *uci = uci_alloc_context();
 	struct interface *master = NULL, *i, *tmp;
 
@@ -1163,6 +1186,7 @@ void odhcpd_reload(void)
 
 static void handle_signal(int signal)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	char b[1] = {0};
 
 	if (signal == SIGHUP) {
@@ -1173,6 +1197,7 @@ static void handle_signal(int signal)
 
 static void reload_cb(struct uloop_fd *u, _unused unsigned int events)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	char b[512];
 	if (read(u->fd, b, sizeof(b)) < 0) {}
 
@@ -1183,6 +1208,7 @@ static struct uloop_fd reload_fd = { .fd = -1, .cb = reload_cb };
 
 void odhcpd_run(void)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);					
 	if (pipe2(reload_pipe, O_NONBLOCK | O_CLOEXEC) < 0) {}
 
 	reload_fd.fd = reload_pipe[0];

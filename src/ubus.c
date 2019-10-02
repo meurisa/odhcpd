@@ -21,6 +21,7 @@ static int handle_dhcpv4_leases(struct ubus_context *ctx, _unused struct ubus_ob
 		struct ubus_request_data *req, _unused const char *method,
 		_unused struct blob_attr *msg)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct interface *iface;
 	time_t now = odhcpd_time();
 	void *a;
@@ -94,6 +95,7 @@ static int handle_dhcpv4_leases(struct ubus_context *ctx, _unused struct ubus_ob
 static void dhcpv6_blobmsg_ia_addr(struct in6_addr *addr, int prefix, uint32_t pref,
 					uint32_t valid, _unused void *arg)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	void *a	= blobmsg_open_table(&b, NULL);
 	char *buf = blobmsg_alloc_string_buffer(&b, "address", INET6_ADDRSTRLEN);
 
@@ -114,6 +116,7 @@ static int handle_dhcpv6_leases(_unused struct ubus_context *ctx, _unused struct
 		_unused struct ubus_request_data *req, _unused const char *method,
 		_unused struct blob_attr *msg)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct interface *iface;
 	time_t now = odhcpd_time();
 	void *a;
@@ -222,6 +225,7 @@ static const struct blobmsg_policy iface_attrs[IFACE_ATTR_MAX] = {
 
 static void handle_dump(_unused struct ubus_request *req, _unused int type, struct blob_attr *msg)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct blob_attr *tb[DUMP_ATTR_MAX];
 	blobmsg_parse(dump_attrs, DUMP_ATTR_MAX, tb, blob_data(msg), blob_len(msg));
 
@@ -236,6 +240,7 @@ static void handle_dump(_unused struct ubus_request *req, _unused int type, stru
 
 static void update_netifd(bool subscribe)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	if (subscribe)
 		ubus_subscribe(ubus, &netifd, objid);
 
@@ -253,6 +258,7 @@ static int handle_update(_unused struct ubus_context *ctx, _unused struct ubus_o
 		_unused struct ubus_request_data *req, _unused const char *method,
 		struct blob_attr *msg)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct blob_attr *tb[IFACE_ATTR_MAX];
 	struct interface *c;
 	bool update = true;
@@ -277,6 +283,7 @@ static int handle_update(_unused struct ubus_context *ctx, _unused struct ubus_o
 
 void ubus_apply_network(void)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct blob_attr *a;
 	unsigned rem;
 
@@ -331,6 +338,7 @@ void ubus_bcast_dhcp_event(const char *type, const uint8_t *mac,
 		const size_t mlen, const struct in_addr *addr, const char *name,
 		const char *interface)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	if (!ubus || !main_object.has_subscribers)
 		return;
 
@@ -350,6 +358,7 @@ void ubus_bcast_dhcp_event(const char *type, const uint8_t *mac,
 static void handle_event(_unused struct ubus_context *ctx, _unused struct ubus_event_handler *ev,
                 _unused const char *type, struct blob_attr *msg)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct blob_attr *tb[OBJ_ATTR_MAX];
 	blobmsg_parse(obj_attrs, OBJ_ATTR_MAX, tb, blob_data(msg), blob_len(msg));
 
@@ -368,6 +377,7 @@ static struct ubus_event_handler event_handler = { .cb = handle_event };
 
 const char* ubus_get_ifname(const char *name)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct blob_attr *c;
 	unsigned rem;
 
@@ -392,6 +402,8 @@ const char* ubus_get_ifname(const char *name)
 
 bool ubus_has_prefix(const char *name, const char *ifname)
 {
+
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct blob_attr *c, *cur;
 	unsigned rem;
 
@@ -427,6 +439,8 @@ bool ubus_has_prefix(const char *name, const char *ifname)
 
 int ubus_init(void)
 {
+
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	if (!(ubus = ubus_connect(NULL))) {
 		syslog(LOG_ERR, "Unable to connect to ubus: %m");
 		return -1;
