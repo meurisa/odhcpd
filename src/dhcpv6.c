@@ -40,11 +40,13 @@ static void handle_client_request(void *addr, void *data, size_t len,
 /* Create socket and register events */
 int dhcpv6_init(void)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	return dhcpv6_ia_init();
 }
 
 int dhcpv6_setup_interface(struct interface *iface, bool enable)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	int ret = 0;
 
 	enable = enable && (iface->dhcpv6 != MODE_DISABLED);
@@ -182,6 +184,7 @@ static void handle_nested_message(uint8_t *data, size_t len,
 				  struct dhcpv6_client_header **c_hdr, uint8_t **opts,
 				  uint8_t **end, struct iovec iov[IOV_TOTAL])
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct dhcpv6_relay_header *r_hdr = (struct dhcpv6_relay_header *)data;
 	uint16_t otype, olen;
 	uint8_t *odata;
@@ -216,6 +219,7 @@ static void handle_nested_message(uint8_t *data, size_t len,
 
 static void update_nested_message(uint8_t *data, size_t len, ssize_t pdiff)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct dhcpv6_relay_header *hdr = (struct dhcpv6_relay_header*)data;
 	if (hdr->msg_type != DHCPV6_MSG_RELAY_FORW)
 		return;
@@ -239,6 +243,7 @@ static void update_nested_message(uint8_t *data, size_t len, ssize_t pdiff)
 static void handle_client_request(void *addr, void *data, size_t len,
 		struct interface *iface, void *dest_addr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct dhcpv6_client_header *hdr = data;
 	uint8_t *opts = (uint8_t *)&hdr[1], *opts_end = (uint8_t *)data + len;
 	bool o_rapid_commit = false;
@@ -462,6 +467,7 @@ static void handle_client_request(void *addr, void *data, size_t len,
 static void handle_dhcpv6(void *addr, void *data, size_t len,
 		struct interface *iface, void *dest_addr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	if (iface->dhcpv6 == MODE_SERVER) {
 		handle_client_request(addr, data, len, iface, dest_addr);
 	} else if (iface->dhcpv6 == MODE_RELAY) {
@@ -476,6 +482,7 @@ static void handle_dhcpv6(void *addr, void *data, size_t len,
 /* Relay server response (regular relay server handling) */
 static void relay_server_response(uint8_t *data, size_t len)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	/* Information we need to gather */
 	uint8_t *payload_data = NULL;
 	size_t payload_len = 0;
@@ -564,6 +571,7 @@ static void relay_server_response(uint8_t *data, size_t len)
 
 static struct odhcpd_ipaddr *relay_link_address(struct interface *iface)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct odhcpd_ipaddr *addr = NULL;
 	time_t now = odhcpd_time();
 
@@ -587,6 +595,7 @@ static struct odhcpd_ipaddr *relay_link_address(struct interface *iface)
 static void relay_client_request(struct sockaddr_in6 *source,
 		const void *data, size_t len, struct interface *iface)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	const struct dhcpv6_relay_header *h = data;
 	/* Construct our forwarding envelope */
 	struct dhcpv6_relay_forward_envelope hdr = {

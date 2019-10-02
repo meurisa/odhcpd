@@ -67,6 +67,7 @@ struct odhcpd_ref_ip {
 /* Create socket and register events */
 int dhcpv4_init(void)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	uloop_timeout_set(&valid_until_timeout, 1000);
 	netlink_add_netevent_handler(&dhcpv4_netevent_handler);
 
@@ -75,6 +76,7 @@ int dhcpv4_init(void)
 
 int dhcpv4_setup_interface(struct interface *iface, bool enable)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	int ret = 0;
 
 	enable = enable && (iface->dhcpv4 != MODE_DISABLED);
@@ -174,6 +176,7 @@ out:
 
 static void dhcpv4_netevent_cb(unsigned long event, struct netevent_handler_info *info)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct interface *iface = info->iface;
 
 	if (!iface || iface->dhcpv4 == MODE_DISABLED)
@@ -193,6 +196,7 @@ static void dhcpv4_netevent_cb(unsigned long event, struct netevent_handler_info
 
 static struct dhcp_assignment *find_assignment_by_hwaddr(struct interface *iface, const uint8_t *hwaddr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct dhcp_assignment *a;
 
 	list_for_each_entry(a, &iface->dhcpv4_assignments, head)
@@ -204,6 +208,7 @@ static struct dhcp_assignment *find_assignment_by_hwaddr(struct interface *iface
 
 static int setup_dhcpv4_addresses(struct interface *iface)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	iface->dhcpv4_start_ip.s_addr = INADDR_ANY;
 	iface->dhcpv4_end_ip.s_addr = INADDR_ANY;
 	iface->dhcpv4_local.s_addr = INADDR_ANY;
@@ -282,12 +287,14 @@ static int setup_dhcpv4_addresses(struct interface *iface)
 
 static void inc_ref_cnt_ip(struct odhcpd_ref_ip **ptr, struct odhcpd_ref_ip *ip)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	*ptr = ip;
 	ip->ref_cnt++;
 }
 
 static void decr_ref_cnt_ip(struct odhcpd_ref_ip **ptr, struct interface *iface)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct odhcpd_ref_ip *ip = *ptr;
 
 	if (--ip->ref_cnt == 0) {
@@ -302,6 +309,7 @@ static void decr_ref_cnt_ip(struct odhcpd_ref_ip **ptr, struct interface *iface)
 
 static bool addr_is_fr_ip(struct interface *iface, struct in_addr *addr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct odhcpd_ref_ip *p;
 
 	list_for_each_entry(p, &iface->dhcpv4_fr_ips, head) {
@@ -315,6 +323,7 @@ static bool addr_is_fr_ip(struct interface *iface, struct in_addr *addr)
 static bool leases_require_fr(struct interface *iface, struct odhcpd_ipaddr *addr,
 				uint32_t mask)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct dhcp_assignment *a = NULL;
 	struct odhcpd_ref_ip *fr_ip = NULL;
 
@@ -339,6 +348,7 @@ static bool leases_require_fr(struct interface *iface, struct odhcpd_ipaddr *add
 
 static void valid_until_cb(struct uloop_timeout *event)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct interface *iface;
 	time_t now = odhcpd_time();
 
@@ -358,6 +368,7 @@ static void valid_until_cb(struct uloop_timeout *event)
 
 static void handle_addrlist_change(struct interface *iface)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct odhcpd_ipaddr ip;
 	struct odhcpd_ref_ip *a;
 	struct dhcp_assignment *c;
@@ -399,6 +410,7 @@ static void handle_addrlist_change(struct interface *iface)
 
 static char *dhcpv4_msg_to_string(uint8_t reqmsg)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	switch (reqmsg) {
 	case (DHCPV4_MSG_DISCOVER):
 		return "DHCPV4_MSG_DISCOVER";
@@ -425,6 +437,7 @@ static char *dhcpv4_msg_to_string(uint8_t reqmsg)
 
 static void dhcpv4_free_assignment(struct dhcp_assignment *a)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	if (a->fr_ip)
 		dhcpv4_fr_stop(a);
 }
@@ -432,6 +445,7 @@ static void dhcpv4_free_assignment(struct dhcp_assignment *a)
 static void dhcpv4_put(struct dhcpv4_message *msg, uint8_t **cookie,
 		uint8_t type, uint8_t len, const void *data)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	uint8_t *c = *cookie;
 	uint8_t *end = (uint8_t *)msg + sizeof(*msg);
 	bool tag_only = type == DHCPV4_OPT_PAD || type == DHCPV4_OPT_END;
@@ -452,6 +466,7 @@ static void dhcpv4_put(struct dhcpv4_message *msg, uint8_t **cookie,
 
 static void dhcpv4_fr_send(struct dhcp_assignment *a)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct dhcpv4_message fr_msg = {
 		.op = DHCPV4_BOOTREPLY,
 		.htype = 1,
@@ -539,6 +554,7 @@ static void dhcpv4_fr_send(struct dhcp_assignment *a)
 
 static void dhcpv4_fr_timer(struct uloop_timeout *event)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct dhcp_assignment *a = container_of(event, struct dhcp_assignment, fr_timer);
 
 	if (a->fr_cnt > 0 && a->fr_cnt < 8) {
@@ -551,6 +567,7 @@ static void dhcpv4_fr_timer(struct uloop_timeout *event)
 
 static void dhcpv4_fr_start(struct dhcp_assignment *a)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	uloop_timeout_set(&a->fr_timer, 1000 << a->fr_cnt);
 	a->fr_timer.cb = dhcpv4_fr_timer;
 	a->fr_cnt++;
@@ -560,6 +577,7 @@ static void dhcpv4_fr_start(struct dhcp_assignment *a)
 
 static void dhcpv4_fr_delay_timer(struct uloop_timeout *event)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct dhcp_assignment *a = container_of(event, struct dhcp_assignment, fr_timer);
 	struct interface *iface = a->iface;
 
@@ -568,6 +586,7 @@ static void dhcpv4_fr_delay_timer(struct uloop_timeout *event)
 
 static void dhcpv4_fr_rand_delay(struct dhcp_assignment *a)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 #define MIN_DELAY   500
 #define MAX_FUZZ    500
 	int msecs;
@@ -582,6 +601,7 @@ static void dhcpv4_fr_rand_delay(struct dhcp_assignment *a)
 
 static void dhcpv4_fr_stop(struct dhcp_assignment *a)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	uloop_timeout_cancel(&a->fr_timer);
 	decr_ref_cnt_ip(&a->fr_ip, a->iface);
 	a->fr_cnt = 0;
@@ -592,6 +612,7 @@ static void dhcpv4_fr_stop(struct dhcp_assignment *a)
 static void handle_dhcpv4(void *addr, void *data, size_t len,
 		struct interface *iface, _unused void *dest_addr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct dhcpv4_message *req = data;
 
 	if (iface->dhcpv4 == MODE_DISABLED)
@@ -903,6 +924,7 @@ static void handle_dhcpv4(void *addr, void *data, size_t len,
 static bool dhcpv4_insert_assignment(struct list_head *list, struct dhcp_assignment *a,
 				     uint32_t addr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	uint32_t h_addr = ntohl(addr);
 	struct dhcp_assignment *c;
 
@@ -925,6 +947,7 @@ static bool dhcpv4_insert_assignment(struct list_head *list, struct dhcp_assignm
 
 static char* ip4toa(uint32_t addr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	static char buf[16];
 
 	snprintf(buf, sizeof(buf), "%u.%u.%u.%u",
@@ -937,6 +960,7 @@ static char* ip4toa(uint32_t addr)
 static bool dhcpv4_assign(struct interface *iface, struct dhcp_assignment *a,
 			  uint32_t raddr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	uint32_t start = ntohl(iface->dhcpv4_start_ip.s_addr);
 	uint32_t end = ntohl(iface->dhcpv4_end_ip.s_addr);
 	uint32_t count = end - start + 1;
@@ -1006,6 +1030,7 @@ dhcpv4_lease(struct interface *iface, enum dhcpv4_msg msg, const uint8_t *mac,
 	     const size_t hostname_len, const bool accept_fr_nonce, bool *incl_fr_opt,
 	     uint32_t *fr_serverid, const char* reqopts, const size_t reqopts_len)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct dhcp_assignment *a = find_assignment_by_hwaddr(iface, mac);
 	struct lease *l = config_find_lease_by_mac(mac);
 	time_t now = odhcpd_time();

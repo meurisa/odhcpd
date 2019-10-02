@@ -56,6 +56,7 @@ static struct event_socket rtnl_event = {
 
 int netlink_init(void)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	rtnl_socket = create_socket(NETLINK_ROUTE);
 	if (!rtnl_socket) {
 		syslog(LOG_ERR, "Unable to open nl socket: %m");
@@ -106,6 +107,7 @@ err:
 
 int netlink_add_netevent_handler(struct netevent_handler *handler)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	if (!handler->cb)
 		return -1;
 
@@ -116,6 +118,7 @@ int netlink_add_netevent_handler(struct netevent_handler *handler)
 
 static void call_netevent_handler_list(unsigned long event, struct netevent_handler_info *info)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct netevent_handler *handler;
 
 	list_for_each_entry(handler, &netevent_handler_list, head)
@@ -124,6 +127,7 @@ static void call_netevent_handler_list(unsigned long event, struct netevent_hand
 
 static void handle_rtnl_event(struct odhcpd_event *e)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct event_socket *ev_sock = container_of(e, struct event_socket, ev);
 
 	nl_recvmsgs_default(ev_sock->sock);
@@ -131,6 +135,7 @@ static void handle_rtnl_event(struct odhcpd_event *e)
 
 static void refresh_iface_addr4(int ifindex)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct odhcpd_ipaddr *addr = NULL;
 	struct interface *iface;
 	ssize_t len = netlink_get_interface_addrs(ifindex, false, &addr);
@@ -181,6 +186,7 @@ static void refresh_iface_addr4(int ifindex)
 
 static void refresh_iface_addr6(int ifindex)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct odhcpd_ipaddr *addr = NULL;
 	struct interface *iface;
 	ssize_t len = netlink_get_interface_addrs(ifindex, true, &addr);
@@ -234,6 +240,7 @@ static void refresh_iface_addr6(int ifindex)
 
 static int handle_rtm_link(struct nlmsghdr *hdr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct ifinfomsg *ifi = nlmsg_data(hdr);
 	struct nlattr *nla[__IFLA_MAX];
 	struct interface *iface;
@@ -265,6 +272,7 @@ static int handle_rtm_link(struct nlmsghdr *hdr)
 
 static int handle_rtm_route(struct nlmsghdr *hdr, bool add)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct rtmsg *rtm = nlmsg_data(hdr);
 	struct nlattr *nla[__RTA_MAX];
 	struct interface *iface;
@@ -304,6 +312,7 @@ static int handle_rtm_route(struct nlmsghdr *hdr, bool add)
 
 static int handle_rtm_addr(struct nlmsghdr *hdr, bool add)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct ifaddrmsg *ifa = nlmsg_data(hdr);
 	struct nlattr *nla[__IFA_MAX];
 	struct interface *iface;
@@ -371,6 +380,7 @@ static int handle_rtm_addr(struct nlmsghdr *hdr, bool add)
 
 static int handle_rtm_neigh(struct nlmsghdr *hdr, bool add)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct ndmsg *ndm = nlmsg_data(hdr);
 	struct nlattr *nla[__NDA_MAX];
 	struct interface *iface;
@@ -417,6 +427,7 @@ static int handle_rtm_neigh(struct nlmsghdr *hdr, bool add)
  * to learn and unlearn hosts on interfaces. */
 static int cb_rtnl_valid(struct nl_msg *msg, _unused void *arg)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct nlmsghdr *hdr = nlmsg_hdr(msg);
 	int ret = NL_SKIP;
 	bool add = false;
@@ -456,6 +467,7 @@ static int cb_rtnl_valid(struct nl_msg *msg, _unused void *arg)
 
 static void catch_rtnl_err(struct odhcpd_event *e, int error)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct event_socket *ev_sock = container_of(e, struct event_socket, ev);
 
 	if (error != ENOBUFS)
@@ -476,6 +488,7 @@ err:
 
 static struct nl_sock *create_socket(int protocol)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct nl_sock *nl_sock;
 
 	nl_sock = nl_socket_alloc();
@@ -506,6 +519,7 @@ struct addr_info {
 
 static int cb_addr_valid(struct nl_msg *msg, void *arg)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct addr_info *ctxt = (struct addr_info *)arg;
 	struct odhcpd_ipaddr *addrs = *(ctxt->addrs);
 	struct nlmsghdr *hdr = nlmsg_hdr(msg);
@@ -573,6 +587,7 @@ static int cb_addr_valid(struct nl_msg *msg, void *arg)
 
 static int cb_addr_finish(_unused struct nl_msg *msg, void *arg)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct addr_info *ctxt = (struct addr_info *)arg;
 
 	ctxt->pending = 0;
@@ -584,6 +599,7 @@ static int cb_addr_finish(_unused struct nl_msg *msg, void *arg)
 static int cb_addr_error(_unused struct sockaddr_nl *nla, struct nlmsgerr *err,
 		void *arg)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct addr_info *ctxt = (struct addr_info *)arg;
 
 	ctxt->pending = 0;
@@ -595,6 +611,7 @@ static int cb_addr_error(_unused struct sockaddr_nl *nla, struct nlmsgerr *err,
 
 static int prefix_cmp(const void *va, const void *vb)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	const struct odhcpd_ipaddr *a = va, *b = vb;
 	int ret = 0;
 
@@ -611,6 +628,7 @@ static int prefix_cmp(const void *va, const void *vb)
 /* compare IPv6 prefixes */
 static int prefix6_cmp(const void *va, const void *vb)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	const struct odhcpd_ipaddr *a = va, *b = vb;
 	uint32_t a_pref = IN6_IS_ADDR_ULA(&a->addr.in6) ? 1 : a->preferred;
 	uint32_t b_pref = IN6_IS_ADDR_ULA(&b->addr.in6) ? 1 : b->preferred;
@@ -621,6 +639,7 @@ static int prefix6_cmp(const void *va, const void *vb)
 /* Detect an IPV6-address currently assigned to the given interface */
 ssize_t netlink_get_interface_addrs(int ifindex, bool v6, struct odhcpd_ipaddr **addrs)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct nl_msg *msg;
 	struct ifaddrmsg ifa = {
 		.ifa_family = v6? AF_INET6: AF_INET,
@@ -698,6 +717,7 @@ struct neigh_info {
 
 static int cb_proxy_neigh_valid(struct nl_msg *msg, void *arg)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct neigh_info *ctxt = (struct neigh_info *)arg;
 	struct nlmsghdr *hdr = nlmsg_hdr(msg);
 	struct ndmsg *ndm;
@@ -727,6 +747,7 @@ static int cb_proxy_neigh_valid(struct nl_msg *msg, void *arg)
 
 static int cb_proxy_neigh_finish(_unused struct nl_msg *msg, void *arg)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct neigh_info *ctxt = (struct neigh_info *)arg;
 
 	ctxt->pending = 0;
@@ -738,6 +759,7 @@ static int cb_proxy_neigh_finish(_unused struct nl_msg *msg, void *arg)
 static int cb_proxy_neigh_error(_unused struct sockaddr_nl *nla, struct nlmsgerr *err,
 		void *arg)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct neigh_info *ctxt = (struct neigh_info *)arg;
 
 	ctxt->pending = 0;
@@ -749,6 +771,7 @@ static int cb_proxy_neigh_error(_unused struct sockaddr_nl *nla, struct nlmsgerr
 /* Detect an IPV6-address proxy neighbor for the given interface */
 int netlink_get_interface_proxy_neigh(int ifindex, const struct in6_addr *addr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct nl_msg *msg;
 	struct ndmsg ndm = {
 		.ndm_family = AF_INET6,
@@ -802,6 +825,7 @@ int netlink_setup_route(const struct in6_addr *addr, const int prefixlen,
 		const int ifindex, const struct in6_addr *gw,
 		const uint32_t metric, const bool add)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct nl_msg *msg;
 	struct rtmsg rtm = {
 		.rtm_family = AF_INET6,
@@ -841,6 +865,7 @@ int netlink_setup_route(const struct in6_addr *addr, const int prefixlen,
 int netlink_setup_proxy_neigh(const struct in6_addr *addr,
 		const int ifindex, const bool add)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct nl_msg *msg;
 	struct ndmsg ndm = {
 		.ndm_family = AF_INET6,
@@ -873,6 +898,7 @@ int netlink_setup_proxy_neigh(const struct in6_addr *addr,
 int netlink_setup_addr(struct odhcpd_ipaddr *addr,
 		const int ifindex, const bool v6, const bool add)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct nl_msg *msg;
 	struct ifaddrmsg ifa = {
 		.ifa_family = v6 ? AF_INET6 : AF_INET,
@@ -939,6 +965,7 @@ int netlink_setup_addr(struct odhcpd_ipaddr *addr,
 
 void netlink_dump_neigh_table(const bool proxy)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct nl_msg *msg;
 	struct ndmsg ndm = {
 		.ndm_family = AF_INET6,
@@ -958,6 +985,7 @@ void netlink_dump_neigh_table(const bool proxy)
 
 void netlink_dump_addr_table(const bool v6)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct nl_msg *msg;
 	struct ifaddrmsg ifa = {
 		.ifa_family = v6 ? AF_INET6 : AF_INET,
