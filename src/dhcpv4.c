@@ -1031,10 +1031,12 @@ dhcpv4_lease(struct interface *iface, enum dhcpv4_msg msg, const uint8_t *mac,
 	     uint32_t *fr_serverid, const char* reqopts, const size_t reqopts_len)
 {
 	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
+	int i = 0;
 	struct dhcp_assignment *a = find_assignment_by_hwaddr(iface, mac);
 	struct lease *l = config_find_lease_by_mac(mac);
 	time_t now = odhcpd_time();
-
+	i+=1;
+	setenv("TESTDING", i, 1);
 	if (l && a && a->lease != l) {
 		free_assignment(a);
 		a = NULL;
