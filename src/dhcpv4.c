@@ -57,6 +57,7 @@ static struct dhcp_assignment* dhcpv4_lease(struct interface *iface,
 static struct netevent_handler dhcpv4_netevent_handler = { .cb = dhcpv4_netevent_cb, };
 static struct uloop_timeout valid_until_timeout = {.cb = valid_until_cb};
 static uint32_t serial = 0;
+static void test(char action[], struct dhcp_assignment *a);
 
 struct odhcpd_ref_ip {
 	struct list_head head;
@@ -438,8 +439,12 @@ static char *dhcpv4_msg_to_string(uint8_t reqmsg)
 static void dhcpv4_free_assignment(struct dhcp_assignment *a)
 {
 	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
+	char action[] = "del";
+	test(action, a);
 	if (a->fr_ip)
+	{
 		dhcpv4_fr_stop(a);
+	}
 }
 
 static void dhcpv4_put(struct dhcpv4_message *msg, uint8_t **cookie,
@@ -711,11 +716,14 @@ static void handle_dhcpv4(void *addr, void *data, size_t len,
 	uint32_t serverid = iface->dhcpv4_local.s_addr;
 	uint32_t fr_serverid = INADDR_ANY;
 
-	if (reqmsg != DHCPV4_MSG_INFORM)
+	if (reqmsg != DHCPV4_MSG_INFORM){
 		a = dhcpv4_lease(iface, reqmsg, req->chaddr, reqaddr,
 				 &leasetime, hostname, hostname_len,
 				 accept_fr_nonce, &incl_fr_opt, &fr_serverid,
 				 reqopts, reqopts_len);
+		syslog(LOG_ERR, "in reqmsg __handle dhcp_assginment");
+		syslog(LOG_ERR, "you never know %s", a->hostname);
+	}
 
 	if (!a) {
 		if (reqmsg == DHCPV4_MSG_REQUEST)
@@ -914,6 +922,10 @@ static void handle_dhcpv4(void *addr, void *data, size_t len,
 			inet_ntoa(dest.sin_addr));
 
 
+	syslog(LOG_ERR, "a ->hostname geprint op het einde van die handle shizzle**************************** lease ====== %s", a->hostname);
+	syslog(LOG_ERR, "mac geprint op het einde van die handle shizzle**************************** lease ====== %d", a->mac[0]);
+	syslog(LOG_ERR, "ifname ->hostname geprint op het einde van die handle shizzle**************************** lease ====== %s", a->iface->ifname);
+	syslog(LOG_ERR, "a ->hostname geprint op het einde van die handle shizzle**************************** lease ====== %s", a->hostname);
 #ifdef WITH_UBUS
 	if (msg == DHCPV4_MSG_ACK)
 		ubus_bcast_dhcp_event("dhcp.ack", req->chaddr, req->hlen, &reply.yiaddr,
@@ -927,7 +939,9 @@ static bool dhcpv4_insert_assignment(struct list_head *list, struct dhcp_assignm
 	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	uint32_t h_addr = ntohl(addr);
 	struct dhcp_assignment *c;
-
+	// char action[3] = "add";
+	
+	syslog(LOG_ERR, "a ->hostname geprint **************************** lease ====== %s", a->hostname);
 	list_for_each_entry(c, list, head) {
 		uint32_t c_addr = ntohl(c->addr);
 
@@ -939,8 +953,12 @@ static bool dhcpv4_insert_assignment(struct list_head *list, struct dhcp_assignm
 	}
 
 	/* Insert new node before c (might match list head) */
+	syslog(LOG_ERR, "a ->hostname geprint **************************** lease ====== %s", a->hostname);
 	a->addr = addr;
 	list_add_tail(&a->head, &c->head);
+	
+	syslog(LOG_ERR, "a ->hostname geprint **************************** lease ====== %s", a->hostname);
+	// test(action, c);
 
 	return true;
 }
@@ -1023,7 +1041,30 @@ static bool dhcpv4_assign(struct interface *iface, struct dhcp_assignment *a,
 	return false;
 }
 
+static void test(char action[], struct dhcp_assignment *a)
+{
+        syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
+	syslog(LOG_ERR, "lease  ==== %s", a->hostname);
+	char *argv[3];
+	int pid;
+	pid = fork();
+	if(pid<0)
+	{
+		return;
+	}
+	if(pid>0)
+	{
+		return;
+	}
+	syslog(LOG_ERR, "action ==== %s", action);
+	argv[0] = "/sbin/hotplug-call";
+        argv[1] = "dhcp";
+        argv[2] = NULL; 
+        execvp(argv[0], argv);
+	exit(127);
 
+
+}
 static struct dhcp_assignment*
 dhcpv4_lease(struct interface *iface, enum dhcpv4_msg msg, const uint8_t *mac,
 	     const uint32_t reqaddr, uint32_t *leasetime, const char *hostname,
@@ -1031,12 +1072,9 @@ dhcpv4_lease(struct interface *iface, enum dhcpv4_msg msg, const uint8_t *mac,
 	     uint32_t *fr_serverid, const char* reqopts, const size_t reqopts_len)
 {
 	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
-	int i = 0;
 	struct dhcp_assignment *a = find_assignment_by_hwaddr(iface, mac);
 	struct lease *l = config_find_lease_by_mac(mac);
 	time_t now = odhcpd_time();
-	i+=1;
-	setenv("TESTDING", i, 1);
 	if (l && a && a->lease != l) {
 		free_assignment(a);
 		a = NULL;
@@ -1094,6 +1132,7 @@ dhcpv4_lease(struct interface *iface, enum dhcpv4_msg msg, const uint8_t *mac,
 
 		if (assigned) {
 			uint32_t my_leasetime;
+			syslog(LOG_ERR, "assigned shizzle huts");
 
 			if (a->leasetime)
 				my_leasetime = a->leasetime;
@@ -1110,6 +1149,7 @@ dhcpv4_lease(struct interface *iface, enum dhcpv4_msg msg, const uint8_t *mac,
 				if (!(a->flags & OAF_STATIC))
 					a->valid_until = now;
 			} else {
+				syslog(LOG_ERR, "else van assigned shizzle huts");
 				if ((!(a->flags & OAF_STATIC) || !a->hostname) && hostname_len > 0) {
 					a->hostname = realloc(a->hostname, hostname_len + 1);
 					if (a->hostname) {

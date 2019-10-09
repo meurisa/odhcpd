@@ -50,11 +50,13 @@ static int urandom_fd = -1;
 
 static void sighandler(_unused int signal)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	uloop_end();
 }
 
 static void print_usage(const char *app)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	printf(
 	"== %s Usage ==\n\n"
 	"  -h, --help   Print this help\n"
@@ -65,6 +67,7 @@ static void print_usage(const char *app)
 
 static bool ipv6_enabled(void)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	int fd = socket(AF_INET6, SOCK_DGRAM, 0);
 
 	if (fd < 0)
@@ -77,6 +80,7 @@ static bool ipv6_enabled(void)
 
 int main(int argc, char **argv)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	openlog("odhcpd", LOG_PERROR | LOG_PID, LOG_DAEMON);
 	int opt;
 
@@ -140,6 +144,7 @@ int main(int argc, char **argv)
 /* Read IPv6 MTU for interface */
 int odhcpd_get_interface_config(const char *ifname, const char *what)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	char buf[64];
 	const char *sysctl_pattern = "/proc/sys/net/ipv6/conf/%s/%s";
 	snprintf(buf, sizeof(buf), sysctl_pattern, ifname, what);
@@ -162,6 +167,7 @@ int odhcpd_get_interface_config(const char *ifname, const char *what)
 /* Read IPv6 MAC for interface */
 int odhcpd_get_mac(const struct interface *iface, uint8_t mac[6])
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct ifreq ifr;
 
 	memset(&ifr, 0, sizeof(ifr));
@@ -179,6 +185,7 @@ ssize_t odhcpd_send(int socket, struct sockaddr_in6 *dest,
 		struct iovec *iov, size_t iov_len,
 		const struct interface *iface)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	/* Construct headers */
 	uint8_t cmsg_buf[CMSG_SPACE(sizeof(struct in6_pktinfo))] = {0};
 	struct msghdr msg = {
@@ -220,6 +227,7 @@ ssize_t odhcpd_send(int socket, struct sockaddr_in6 *dest,
 
 static int odhcpd_get_linklocal_interface_address(int ifindex, struct in6_addr *lladdr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	int ret = -1;
 	struct sockaddr_in6 addr;
 	socklen_t alen = sizeof(addr);
@@ -252,6 +260,7 @@ static int odhcpd_get_linklocal_interface_address(int ifindex, struct in6_addr *
  */
 int odhcpd_get_interface_dns_addr(const struct interface *iface, struct in6_addr *addr)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	time_t now = odhcpd_time();
 	ssize_t m = -1;
 
@@ -290,6 +299,7 @@ int odhcpd_get_interface_dns_addr(const struct interface *iface, struct in6_addr
 
 struct interface* odhcpd_get_interface_by_index(int ifindex)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct interface *iface;
 
 	avl_for_each_element(&interfaces, iface, avl) {
@@ -303,6 +313,7 @@ struct interface* odhcpd_get_interface_by_index(int ifindex)
 /* Convenience function to receive and do basic validation of packets */
 static void odhcpd_receive_packets(struct uloop_fd *u, _unused unsigned int events)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct odhcpd_event *e = container_of(u, struct odhcpd_event, uloop);
 
 	uint8_t data_buf[8192], cmsg_buf[128];
@@ -415,6 +426,7 @@ static void odhcpd_receive_packets(struct uloop_fd *u, _unused unsigned int even
 /* Register events for the multiplexer */
 int odhcpd_register(struct odhcpd_event *event)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	event->uloop.cb = odhcpd_receive_packets;
 	return uloop_fd_add(&event->uloop, ULOOP_READ |
 			((event->handle_error) ? ULOOP_ERROR_CB : 0));
@@ -422,23 +434,27 @@ int odhcpd_register(struct odhcpd_event *event)
 
 int odhcpd_deregister(struct odhcpd_event *event)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	event->uloop.cb = NULL;
 	return uloop_fd_delete(&event->uloop);
 }
 
 void odhcpd_process(struct odhcpd_event *event)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	odhcpd_receive_packets(&event->uloop, 0);
 }
 
 int odhcpd_urandom(void *data, size_t len)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	return read(urandom_fd, data, len);
 }
 
 
 time_t odhcpd_time(void)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	struct timespec ts;
 	syscall(SYS_clock_gettime, CLOCK_MONOTONIC, &ts);
 	return ts.tv_sec;
@@ -459,6 +475,7 @@ static const int8_t hexvals[] = {
 
 ssize_t odhcpd_unhexlify(uint8_t *dst, size_t len, const char *src)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	size_t c;
 	for (c = 0; c < len && src[0] && src[1]; ++c) {
 		int8_t x = (int8_t)*src++;
@@ -478,6 +495,7 @@ ssize_t odhcpd_unhexlify(uint8_t *dst, size_t len, const char *src)
 
 void odhcpd_hexlify(char *dst, const uint8_t *src, size_t len)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	for (size_t i = 0; i < len; ++i) {
 		*dst++ = hexdigits[src[i] >> 4];
 		*dst++ = hexdigits[src[i] & 0x0f];
@@ -487,6 +505,7 @@ void odhcpd_hexlify(char *dst, const uint8_t *src, size_t len)
 
 const char *odhcpd_print_mac(const uint8_t *mac, const size_t len)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	static char buf[32];
 
 	snprintf(buf, sizeof(buf), "%02x", mac[0]);
@@ -498,6 +517,7 @@ const char *odhcpd_print_mac(const uint8_t *mac, const size_t len)
 
 int odhcpd_bmemcmp(const void *av, const void *bv, size_t bits)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	const uint8_t *a = av, *b = bv;
 	size_t bytes = bits / 8;
 	bits %= 8;
@@ -512,6 +532,7 @@ int odhcpd_bmemcmp(const void *av, const void *bv, size_t bits)
 
 void odhcpd_bmemcpy(void *av, const void *bv, size_t bits)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	uint8_t *a = av;
 	const uint8_t *b = bv;
 
@@ -528,6 +549,7 @@ void odhcpd_bmemcpy(void *av, const void *bv, size_t bits)
 
 int odhcpd_netmask2bitlen(bool inet6, void *mask)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	int bits;
 	struct in_addr *v4;
 	struct in6_addr *v6;
@@ -546,6 +568,7 @@ int odhcpd_netmask2bitlen(bool inet6, void *mask)
 
 bool odhcpd_bitlen2netmask(bool inet6, unsigned int bits, void *mask)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 	uint8_t b;
 	struct in_addr *v4;
 	struct in6_addr *v6;
@@ -578,6 +601,7 @@ bool odhcpd_bitlen2netmask(bool inet6, unsigned int bits, void *mask)
 
 bool odhcpd_valid_hostname(const char *name)
 {
+	syslog(LOG_ERR, "debug trace alex %s:%s",__FILE__,__func__);
 #define MAX_LABEL	63
 	const char *c, *label, *label_end;
 	int label_sz = 0;
